@@ -1,3 +1,16 @@
+# Training corpus
+corpus
+!corpus/commands
+
+# Emacs backup files
+*~
+
+# Emacs Org-mode files
+*.org
+
+# Reddit API info
+config
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
