@@ -9,7 +9,7 @@ corpus
 *.org
 
 # Reddit API info
-config
+config.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
