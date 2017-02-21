@@ -1,5 +1,5 @@
 from nltk import word_tokenize as tokenize
-import sklearn
+import copy
 import random
 import numpy as np
 
@@ -8,6 +8,7 @@ def tokenize_file(filename):
     sents = []
     file = open(filename,'r')
     for line in file:
+        # a sentence is a list of tokens (strings/words)
         sents.append(tokenize(line.lower()))    
     return sents
 
@@ -35,43 +36,55 @@ def vectorize(sentence, vocab):
             vector[i] = 1
     return np.transpose(vector)
 
+# convert plaintext files of sample queryies into list of numerical vectors
+# so that the neural network can understand them
 def parse_files():
-    weather_sents = tokenize_file('./corpus/commands/weather.txt')
-    twitter_sents = tokenize_file('./corpus/commands/trending.txt')
-    news_sents = tokenize_file('./corpus/commands/headlines.txt')
-    gibberish_sents = tokenize_file('./corpus/commands/gibberish.txt')
+    files = ['./corpus/weather.txt', './corpus/trending.txt',
+             './corpus/headlines.txt', './corpus/gibberish.txt']
+    corpora = []
+    for f in files:
+        corpora.append(tokenize_file(f))
 
-    corpora = [weather_sents, twitter_sents, news_sents, gibberish_sents]
+    # make list of all words in training set
     words = all_words(corpora)
+    # remove duplicates and convert to list
     vocab = list(set(words))
 
     global dataset
     dataset = []
+    # iterate over each file
     for i in range(len(corpora)):
+        # create desired output vector based on where
+        # the sentence came from
         v = np.zeros([len(corpora), 1])
         v[i] = 1
+        # convert every sentence into an array of 1's and 0's
         for sentence in corpora[i]:
+            # put ordered pair [input, output] in dataset list
             dataset.append([vectorize(sentence, vocab),
                             np.transpose(v)])
+    # return length input layer, length of output layer, and number of
+    # training samples
+    return len(vocab), len(corpora), len(dataset)
 
-    return len(vocab), len(corpora), len(datset)
-
-# partition datset into training and test sets
+# Partition datset into training and test sets
+# Since this dataset is small, we can use Leave One Out cross-validation
 def make_sets():
-    # make the test set of one input patter
+    # make the test set of one input pattern
     global test_set
+    # pick a random sample from main dataset
     i = random.randrange(len(dataset))
     test_set = copy.deepcopy(dataset[i])
+
     # make the training set of all other patterns
     global train_set
     train_set = []
 
     for j in range(len(dataset)):
         if i is not j:
-            train_set
-    
+            train_set.append(copy.deepcopy(dataset[j]))
 
-# return the next pattern to feed forward
+# return the next pattern to feed forward and train the neural network
 def next_stimulus():
     i = random.randrange(len(train_set))
     return train_set[i]
