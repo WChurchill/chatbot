@@ -1,2 +1,4 @@
 # chatbot
-A chatbot based on learned word embeddings and recursive neural network encoders/decoders
+
+A chatbot that reads natural language and performs an action
+based on unigram analysis
